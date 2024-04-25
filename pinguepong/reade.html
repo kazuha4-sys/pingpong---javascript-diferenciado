@@ -133,7 +133,7 @@
                 <hr>
             </div>
     
-            <form action="ping_pong.html">
+            <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
                 <label for="username">RA do Aluno</label>
                 <input type="text" id="username" placeholder="RA do Aluno">
     
