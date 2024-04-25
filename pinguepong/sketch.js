@@ -1,3 +1,5 @@
+// Copyright (c) 2024 Kaun e Enzo
+// GitHub: https://github.com/kazuha4-sys/
 let ball;
 let player;
 let score = 0;
