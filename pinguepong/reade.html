@@ -1,0 +1,275 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.js"></script>
+    <title>Pong Online</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            max-width: 100%;
+            text-align: center;
+        }
+
+        .logo h1 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #0043fd;
+            font-size: 16px;
+        }
+
+        footer ul {
+            padding: 0;
+            list-style-type: none;
+            margin: 0;
+        }
+
+        footer ul li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        footer ul li:last-child {
+            margin-right: 0;
+        }
+
+        footer ul li a {
+            color: #0043fd;
+            text-decoration: none;
+        }
+
+        footer ul li a:hover {
+            text-decoration: underline;
+        }
+
+        #paginaCentral {
+            display: none;
+        }
+
+        #score {
+            margin-top: 20px;
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        #main {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="paginaLogin">
+        <div class="container">
+            <div class="logo">
+                <h1>Pong Online</h1>
+                <p>Crie sua conta</p>
+                <hr>
+            </div>
+    
+            <form action="ping_pong.html">
+                <label for="username">RA do Aluno</label>
+                <input type="text" id="username" placeholder="RA do Aluno">
+    
+                <label for="password">Senha</label>
+                <input type="password" id="password" placeholder="Senha">
+    
+                <button type="submit">Entrar</button>
+    
+                <a href="recuper_conta.html">Recuperar conta</a>
+            </form>
+        </div>
+    
+        <div class="footer">
+            <footer>
+                <ul>
+                    <li><a href="programadores.html">Programadores</a></li>
+                    <li><a href="privacidade.html">Política de privacidade</a></li>
+                    <li><a href="cadastro.html">RA</a></li>
+                </ul>
+            </footer>
+        </div>
+    </div>
+
+    <div id="paginaCentral">
+        <div id="main">
+            <!-- O canvas será anexado aqui -->
+        </div>
+        <div id="score">Pontuação: 0</div>
+    </div>
+    
+    <script>
+        let ball;
+        let player;
+        let score = 0;
+        const paddleWidth = 75;
+        const paddleHeight = 10;
+
+        function setup() {
+            const canvas = createCanvas(800, 400);
+            canvas.parent('main');
+
+            ball = {
+                x: width / 2,
+                y: height / 2,
+                radius: 10,
+                speed: 2,
+                dx: 2,
+                dy: 2
+            };
+
+            player = {
+                x: width / 2 - paddleWidth / 2,
+                y: height - paddleHeight - 10,
+                width: paddleWidth,
+                height: paddleHeight,
+                dy: 5
+            };
+        }
+
+        function draw() {
+            background(0);
+
+            drawBall();
+            drawPaddle();
+
+            movePaddle();
+            moveBall();
+
+            checkCollisions();
+            checkScore();
+        }
+
+        function drawBall() {
+            fill(255);
+            ellipse(ball.x, ball.y, ball.radius * 2);
+        }
+
+        function drawPaddle() {
+            fill(255);
+            rect(player.x, player.y, player.width, player.height);
+        }
+
+        function movePaddle() {
+            if (keyIsDown(65) && player.x > 0) { // "A" key
+                player.x -= player.dy;
+            } else if (keyIsDown(68) && player.x + player.width < width) { // "D" key
+                player.x += player.dy;
+            }
+        }
+
+        function moveBall() {
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+        }
+
+        function checkCollisions() {
+            // Colisão com as laterais da tela
+            if (ball.x + ball.radius > width || ball.x - ball.radius < 0) {
+                ball.dx *= -1;
+            }
+
+            // Colisão com a raquete
+            if (ball.x + ball.radius > player.x && ball.x - ball.radius < player.x + player.width && ball.y + ball.radius > player.y) {
+                ball.dy *= -1;
+                score++;
+                updateScore();
+            }
+
+            // Colisão com a parte superior da tela
+            if (ball.y - ball.radius < 0) {
+                ball.dy *= -1;
+            }
+        }
+
+        function checkScore() {
+            // Verifica se a bola ultrapassou a raquete
+            if (ball.y + ball.radius > height) {
+                score = 0; // Resetar a pontuação
+                updateScore();
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = "Pontuação: " + score;
+        }
+
+        function mostrarPagina(idPagina) {
+            // Esconder todas as páginas
+            var paginas = document.querySelectorAll('[id^="pagina"]');
+            for (var i = 0; i < paginas.length; i++) {
+                paginas[i].style.display = 'none';
+            }
+
+            // Mostrar a página selecionada
+            document.getElementById(idPagina).style.display = 'block';
+        }
+    </script>
+</body>
+</html>
